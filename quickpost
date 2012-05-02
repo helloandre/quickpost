@@ -1,0 +1,89 @@
+#! /usr/bin/ruby
+
+def fail(msg)
+  puts "ERROR: " + msg
+  puts "-------------"
+  puts "See `quickpost --help`"
+  exit!
+end
+
+# Some defaultså
+options = {
+  "date" => Time.now.to_s
+}
+
+help = <<HELP
+Quickpost - a quick way to start a new post with Jekyll
+
+Requires that _posts exits in current directory
+
+Basic Usage:
+    quickpost <title>                # create a post with today's date
+
+Flags:
+HELP
+
+require 'optparse'
+opts = OptionParser.new do |opts|
+  opts.banner = help
+
+  opts.on("-t", "--title TITLE", "The title of the new post") do |title|
+    options['title'] = title unless title.nil?
+  end
+
+  opts.on("-d", "--date [DATE]", "The date of the new post (default Time.now)") do |date|
+    options['date'] = date unless date.nil?
+  end
+end
+
+# if they didn't give us anything
+if ARGV.size == 0
+  puts opts.to_s
+  exit!
+end
+
+opts.parse!
+
+# this must come after opts.parse! but as early as possible
+# check to make sure we're in a jekyll root dir
+posts_dir = Dir.pwd + '/_posts'
+fail("Directory _posts not found") if !File.directory?(posts_dir)
+
+# if they only set date with flags
+if ARGV.size > 0
+  options['title'] = ARGV[0]
+end
+
+# if we haven't set the title yet
+fail("Title not set") if options['title'].nil?
+
+# check date for validity
+require 'date'
+begin
+  date = Date.parse options['date']
+rescue ArgumentError => err
+  fail("#{date} is an invalid date")
+end
+
+# sanitize title/date
+safe_title = options['title'].downcase.gsub(/[^a-z0-9]+/, '-').chomp('-')
+safe_date = date.to_s
+
+file_name = safe_date + '-' + safe_title + '.md'
+full_file_path = posts_dir + '/' + file_name
+
+# check if file exists
+fail("#{file_name} already exists") if File.exists?(full_file_path)
+
+# assumes you want .md
+contents = "---
+title: #{options['title']}
+date: #{date}
+---
+##{options['title']}"
+
+File.open(full_file_path, "w") do |f|
+  f.write(contents)
+end
+
+puts "#{file_name} created successfully"
