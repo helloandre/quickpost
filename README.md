@@ -15,6 +15,15 @@ Creates a new markdown file in _posts with the proper formatting of date and url
  * cd into your jekyll root directory (where your _config.yml is/would be)
  * `quickpost <title>`
 
+## Example
+
+`quickpost "Hello, World" --date "1/1/2013"`
+
+creates
+
+_posts/2013-01-01-hello-world.md
+
+
 ## Help
 
  * see `quickpost --help` for more usage
