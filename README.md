@@ -11,8 +11,8 @@
 ## Usage
 
  * cd into your jekyll root directory (where your _config.yml is/would be)
- * `quickpost`
+ * `quickpost <title>`
 
-## Options
+## Help
 
- * -t (--title [TITLE])
+ * see `quickpost --help` for more usage
